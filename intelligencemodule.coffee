@@ -46,7 +46,7 @@ memoryDecayMS = 0
 #endregion
 
 ############################################################
-intelligencemodule.initialize = () ->
+intelligencemodule.initialize = ->
     log "intelligencemodule.initialize"
     situationAnalyzer = allModules.situationanalyzermodule
     situations = situationAnalyzer.situations
@@ -211,6 +211,7 @@ perceiveAllIdeas = ->
     # log "perceiveAllIdeas"
     for strategy in strategies
         ideas = strategy.getRelevantIdeas()
+        olog ideas
         perceiveIdeas(ideas)
     return
 
@@ -311,19 +312,22 @@ createCancelAction = (orderObject) ->
 act = ->
     log "act"
     for action in newActions
-        if action.type == "placeOrder"
-            order = {}
-            order.pair = action.idea.assetPair
-            order.type = action.idea.type
-            order.price = action.idea.price
-            order.volume = action.idea.volume
-            sendPlaceOrderRequest(action.idea.exchange, order)
-            action.idea.isActed = true
-        if action.type == "cancelOrder"
-            order = {}
-            order.id = action.order.id
-            order.pair = action.order.assetPair
-            sendCancelRequest(action.order.exchange, order)
+        message = "we would do the action: \n"+ostr(action)
+        log message
+
+        # if action.type == "placeOrder"
+        #     order = {}
+        #     order.pair = action.idea.assetPair
+        #     order.type = action.idea.type
+        #     order.price = action.idea.price
+        #     order.volume = action.idea.volume
+        #     sendPlaceOrderRequest(action.idea.exchange, order)
+        #     action.idea.isActed = true
+        # if action.type == "cancelOrder"
+        #     order = {}
+        #     order.id = action.order.id
+        #     order.pair = action.order.assetPair
+        #     sendCancelRequest(action.order.exchange, order)
     
     newActions.length = 0
     return
