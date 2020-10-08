@@ -97,16 +97,16 @@ processCycle = ->
     savingTime = savingTime.toFixed(3)
     processingTime = processingTime.toFixed(3)
     
-    log " - - - - - "
-    log "performance checking..." 
-    log "time used for state processing: " + processingTime + "ms" 
-    log "time used for memory saving: " + savingTime + "ms"
+    # log " - - - - - "
+    # log "performance checking..." 
+    # log "time used for state processing: " + processingTime + "ms" 
+    # log "time used for memory saving: " + savingTime + "ms"
     return
 
 ############################################################
 #region perceiveNewSituation
 perceiveNewSituation = ->
-    log "perceiveNewSituation"
+    # log "perceiveNewSituation"
     for exchange in cfg.activeExchanges
         situation = situations[exchange]
         for assetPair,orders of situation.latestOrders
@@ -124,7 +124,7 @@ perceiveNewSituation = ->
 perceiveOrder = (exchange, assetPair, order, status) ->
     orderObj = createOrderObject(exchange, assetPair, order, status)
     key = getOrderObjectKey(orderObj)
-    if orderMemory[key]? perceiveExistingOrder(orderObj)
+    if orderMemory[key]? then perceiveExistingOrder(orderObj)
     else perceiveNewOrder(orderObj)
     return
 
@@ -139,7 +139,11 @@ perceiveExistingOrder = (newOrderObject) ->
         
     idea = ideaMemory[ideaKey]
 
+    # log "peceived existing Order having an idea attached"
+    # olog idea
+
     if newOrderObject.status == "filled"
+        # log "the order got filled!"
         orderObject.status = "filled"
         idea.isFilled = true
         ownr = idea.owner
@@ -148,12 +152,16 @@ perceiveExistingOrder = (newOrderObject) ->
         return
     
     if newOrderObject.status == "cancelled"
+        # log "the order got cancelled!"
         orderObject.status = "cancelled"
         idea.isCancelled = true
         ownr = idea.owner
         event = {type:"cancelled", idea: idea}
         allModules[ownr].noticeRelevantEvents([event])
         return
+    
+    # log "nothing special was with that order!"
+    # log " - - - "
     return
 
 perceiveNewOrder = (orderObject) ->
@@ -174,12 +182,12 @@ recognizeOrderPlacementActionEffects = ->
         connectNewOrderToIdea(order, action.idea)
         if order.status == "filled"
             action.idea.isFilled = true
-            ownr = idea.owner
+            ownr = action.idea.owner
             event = {type:"instaFill", idea:action.idea}
             allModules[ownr].noticeRelevantEvents([event])
         if order.status == "cancelled"
             action.idea.isCancelled = true
-            ownr = idea.owner
+            ownr = action.idea.owner
             event = {type:"instaCancel", idea:action.idea}
             allModules[ownr].noticeRelevantEvents([event])
 
@@ -312,22 +320,19 @@ createCancelAction = (orderObject) ->
 act = ->
     log "act"
     for action in newActions
-        message = "we would do the action: \n"+ostr(action)
-        log message
-
-        # if action.type == "placeOrder"
-        #     order = {}
-        #     order.pair = action.idea.assetPair
-        #     order.type = action.idea.type
-        #     order.price = action.idea.price
-        #     order.volume = action.idea.volume
-        #     sendPlaceOrderRequest(action.idea.exchange, order)
-        #     action.idea.isActed = true
-        # if action.type == "cancelOrder"
-        #     order = {}
-        #     order.id = action.order.id
-        #     order.pair = action.order.assetPair
-        #     sendCancelRequest(action.order.exchange, order)
+        if action.type == "placeOrder"
+            order = {}
+            order.pair = action.idea.assetPair
+            order.type = action.idea.type
+            order.price = action.idea.price
+            order.volume = action.idea.volume
+            sendPlaceOrderRequest(action.idea.exchange, order)
+            action.idea.isActed = true
+        if action.type == "cancelOrder"
+            order = {}
+            order.id = action.order.id
+            order.pair = action.order.assetPair
+            sendCancelRequest(action.order.exchange, order)
     
     newActions.length = 0
     return
@@ -335,16 +340,16 @@ act = ->
 ############################################################
 sendCancelRequest = (exchange,orders) ->
     log "sendCancelRequest"
-    olog orders
-    return
+    # olog orders
+    # return
     try await network.cancelOrders(exchange, orders)
     catch err then log err
     return
 
 sendPlaceOrderRequest = (exchange, orders) ->
     log "sendPlaceOrderRequest"
-    olog orders
-    return
+    # olog orders
+    # return
     try await network.placeOrders(exchange, orders)
     catch err then log err
     return
