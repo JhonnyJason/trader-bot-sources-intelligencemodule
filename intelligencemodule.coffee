@@ -220,17 +220,19 @@ perceiveAllIdeas = ->
     for strategy in strategies
         ideas = strategy.getRelevantIdeas()
         olog ideas
-        perceiveIdeas(ideas)
+        ideaDecayMS = strategy.ideaDecayMS
+        if !ideaDecayMS then ideaDecayMS = memoryDecayMS
+        perceiveIdeas(ideas, ideaDecayMS)
     return
 
-perceiveIdeas = (ideas) ->
+perceiveIdeas = (ideas, ideaDecayMS) ->
     # log "perceiveIdeas"
     return unless ideas
     for exchange,pairMap of ideas
         for assetPair,ideaList of pairMap
             for idea in ideaList
                 key = getIdeaKey(idea)
-                remember(idea, key, ideaMemory, memoryDecayMS)
+                remember(idea, key, ideaMemory, ideaDecayMS)
     return
 
 #endregion
