@@ -14,6 +14,7 @@ print = (arg) -> console.log(arg)
 performance = require("perf_hooks").performance
 
 situationAnalyzer = null
+budgetManager = null
 network = null
 state = null
 cfg = null
@@ -50,6 +51,8 @@ intelligencemodule.initialize = ->
     log "intelligencemodule.initialize"
     situationAnalyzer = allModules.situationanalyzermodule
     situations = situationAnalyzer.situations
+
+    budgetManager = allModules.budgetmanagermodule
     network = allModules.networkmodule
     state = allModules.persistentstatemodule
     utl = allModules.utilmodule
@@ -84,6 +87,9 @@ processCycle = ->
     recognizeOrderPlacementActionEffects()
     processIdeas()
     act()
+
+    checkAlienBudgetUsage()
+    budgetManager.printCurrentBudgets()
 
     afterActionTime = performance.now()
 
@@ -359,6 +365,35 @@ sendPlaceOrderRequest = (exchange, orders) ->
 #endregion
 
 ############################################################
+checkAlienBudgetUsage = ->
+    budgetManager.freeAllBudgetsForStrategy("none")
+    for orderId,order of orderMemory
+        allocateAlienBudgetFor(order)
+    return
+
+allocateAlienBudgetFor = (order) ->
+    if order.ideaKey then return
+    return unless order.status ==  "open"
+    exchange = order.exchange
+    assetPair = order.assetPair
+    volume = order.volume
+
+    assets = assetPair.split("-")
+    asset = assets[0]
+
+    if order.type == "buy" 
+        volume = volume * order.price
+        asset = assets[1]
+    
+    # olog order
+    # log "allocating volume: " + volume
+    # log " - - - "
+    try budgetManager.allocate("none", exchange, asset, volume)
+    catch error then log error.stack
+
+    return
+
+############################################################
 saveMemory = ->
     log "saveMemory"
     state.save("actionMemory", actionMemory)
@@ -448,6 +483,7 @@ letForget = (key, memory, decayMS) ->
 ideaIsStupid = (idea) ->
     # log "ideaIsStupid"
     return false if idea.id
+    return false if idea.goStubborn
 
     exchange = idea.exchange
     assetPair = idea.assetPair
