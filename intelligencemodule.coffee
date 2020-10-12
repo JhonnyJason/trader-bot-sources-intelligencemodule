@@ -89,7 +89,6 @@ processCycle = ->
     act()
 
     checkAlienBudgetUsage()
-    budgetManager.printCurrentBudgets()
 
     afterActionTime = performance.now()
 
@@ -225,7 +224,7 @@ perceiveAllIdeas = ->
     # log "perceiveAllIdeas"
     for strategy in strategies
         ideas = strategy.getRelevantIdeas()
-        olog ideas
+        # olog ideas
         ideaDecayMS = strategy.ideaDecayMS
         if !ideaDecayMS then ideaDecayMS = memoryDecayMS
         perceiveIdeas(ideas, ideaDecayMS)
