@@ -268,7 +268,8 @@ createAllActions = ->
 createAllCancelActions = ->
     # log "createAllCancelActions"
     for orderKey,orderObject of orderMemory when orderObject.ideaKey
-        continue if ideaMemory[orderObject.ideaKey]?
+        continue unless ideaMemory[orderObject.ideaKey]
+        continue unless ideaMemory[orderObject.ideaKey].cancelledSignal
         createCancelAction(orderObject)
 
     return
@@ -279,6 +280,7 @@ createAllOrderPlacementActions = ->
         continue if idea.isRealized
         continue if idea.isFilled
         continue if idea.isCancelled
+        continue if idea.cancelledSignal
         if ideaIsStupid(idea)
             idea.isStupid = true
             ownr = idea.owner
