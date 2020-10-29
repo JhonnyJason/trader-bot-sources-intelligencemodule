@@ -349,16 +349,16 @@ act = ->
 ############################################################
 sendCancelRequest = (exchange,orders) ->
     log "sendCancelRequest"
-    olog orders
-    return
+    # olog orders
+    # return
     try await network.cancelOrders(exchange, orders)
     catch err then log err
     return
 
 sendPlaceOrderRequest = (exchange, orders) ->
     log "sendPlaceOrderRequest"
-    olog orders
-    return
+    # olog orders
+    # return
     try await network.placeOrders(exchange, orders)
     catch err then log err
     return
