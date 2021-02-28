@@ -483,6 +483,7 @@ letForget = (key, memory, decayMS) ->
 
 ideaIsStupid = (idea) ->
     # log "ideaIsStupid"
+    return false
     return false if idea.id
     return false if idea.goStubborn
 
