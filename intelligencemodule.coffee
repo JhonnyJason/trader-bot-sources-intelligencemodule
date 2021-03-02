@@ -280,6 +280,7 @@ createAllOrderPlacementActions = ->
         continue if idea.isRealized
         continue if idea.isFilled
         continue if idea.isCancelled
+        continue if idea.cancelledSignal
         if ideaIsStupid(idea)
             idea.isStupid = true
             ownr = idea.owner
