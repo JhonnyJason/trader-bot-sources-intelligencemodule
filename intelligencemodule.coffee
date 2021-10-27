@@ -84,6 +84,7 @@ processCycle = ->
     starttime = performance.now()
 
     perceiveNewSituation()
+    return
     recognizeOrderPlacementActionEffects()
     processIdeas()
     act()
