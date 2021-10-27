@@ -82,7 +82,7 @@ processCycle = ->
     return unless situationAnalyzer.ready
     
     starttime = performance.now()
-    return
+    
     perceiveNewSituation()
     return
     recognizeOrderPlacementActionEffects()
@@ -116,6 +116,8 @@ perceiveNewSituation = ->
     for exchange in cfg.activeExchanges
         situation = situations[exchange]
         for assetPair,orders of situation.latestOrders
+            olog orders
+            continue
             for order in orders.buyStack
                 perceiveOrder(exchange, assetPair, order, "open")
             for order in orders.sellStack
