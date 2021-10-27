@@ -82,7 +82,7 @@ processCycle = ->
     return unless situationAnalyzer.ready
     
     starttime = performance.now()
-
+    return
     perceiveNewSituation()
     return
     recognizeOrderPlacementActionEffects()
